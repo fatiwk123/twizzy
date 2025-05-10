@@ -11,7 +11,7 @@ Ce projet implémente un système de détection et reconnaissance de panneaux de
 - Détection en temps réel sur image et vidéo
 
 ## Auteurs
-Fati + (coéquipiers)
+Fati 
 
 ## Dossiers
 - `src/` : scripts Python
