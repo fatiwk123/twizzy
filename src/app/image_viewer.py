@@ -41,6 +41,7 @@ class ImageViewer:
         self.image_opened_path = None
 
     def select_image(self):
+        """Selects an image using file explorer"""
         file_path = filedialog.askopenfilename(
             filetypes=[("Image files", "*.jpg *.png *.jpeg")]
         )
@@ -50,7 +51,7 @@ class ImageViewer:
             )  # On lance la méthode display_image si on a bien selectionne une image
 
     def display_image(self, file_path):
-        # Ouvre et redimensionne l'image pour qu'elle tienne dans le canvas (optionnel)
+        """Displays the selected image in the frame"""
         img_pil = Image.open(file_path)
         img_pil = img_pil.resize(
             (800, 800), Image.LANCZOS
@@ -63,11 +64,5 @@ class ImageViewer:
         self.canvas.create_image(0, 0, anchor="nw", image=self.image_tk)
 
     def image_treatment_placeholder(self):
-        # call function that uses path to launch an analysis
+        """Process current image"""
         return 0
-
-
-# Run the app; Put in a main file later
-root = tk.Tk()
-app = ImageViewer(root)
-root.mainloop()
