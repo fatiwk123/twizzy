@@ -66,9 +66,3 @@ class ImageViewer:
     def image_treatment_placeholder(self):
         """Process current image"""
         return 0
-
-
-# Run the app; Put in a main file later
-root = tk.Tk()
-app = ImageViewer(root)
-root.mainloop()

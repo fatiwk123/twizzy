@@ -89,8 +89,3 @@ class VideoViewer:
     def process_video(self):
         """Placeholder for video processing (e.g., filters, object detection)."""
         return 0
-
-
-root = tk.Tk()
-app = VideoViewer(root)
-root.mainloop()
