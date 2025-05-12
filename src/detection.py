@@ -2,7 +2,9 @@ import cv2
 import numpy as np
 import os
 
-def detect_and_extract_shapes(image_path, output_dir):
+def detect_and_extract_shapes(image_path, output_dir = 'panneaux_extraits'):
+    os.makedirs(output_dir, exist_ok=True)
+    
     # Charger l'image
     image = cv2.imread(image_path)
     if image is None:
@@ -40,8 +42,8 @@ def detect_and_extract_shapes(image_path, output_dir):
     contours, _ = cv2.findContours(red_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     # Afficher le masque rouge pour déboguer
-    cv2.imshow("Red Mask", red_mask)
-    cv2.waitKey(0)
+    # cv2.imshow("Red Mask", red_mask)
+    # cv2.waitKey(0)
 
     # Parcourir les contours détectés
     for cnt in contours:
@@ -73,8 +75,8 @@ def detect_and_extract_shapes(image_path, output_dir):
             continue
 
         # Afficher la ROI pour déboguer
-        cv2.imshow("ROI", roi)
-        cv2.waitKey(0)
+        # cv2.imshow("ROI", roi)
+        # cv2.waitKey(0)
 
         # Ajouter une condition pour ne pas sauvegarder les formes inconnues
         
@@ -85,15 +87,15 @@ def detect_and_extract_shapes(image_path, output_dir):
         print(f"Sauvegarde : {filename}")
 
     # Afficher les images
-    cv2.imshow("Image originale", image_clean)
-    cv2.imshow("Contours", image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
+    # cv2.imshow("Image originale", image_clean)
+    # cv2.imshow("Contours", image)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+    return image
 # Chemin de l'image d'entrée et du dossier de sortie
 image_path = 'images/image_test__final/G0020129.JPG'  # Remplace par le chemin de ton image
 output_dir = 'panneaux_extraits'
-os.makedirs(output_dir, exist_ok=True)
+
 
 # Appeler la fonction
 detect_and_extract_shapes(image_path, output_dir)
