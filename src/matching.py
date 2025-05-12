@@ -5,86 +5,88 @@ import os
 def preprocess_image(image, target_size=(100, 100)):
     # Convertir en niveaux de gris
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    # Redimensionner l'image
+    # Redimensionner
     resized = cv2.resize(gray, target_size)
-
     return resized
 
 def template_matching_orb(extraits_dir, templates_dir, target_size=(100, 100)):
-    # Initialiser le détecteur ORB et le matcher
     orb = cv2.ORB_create()
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
-    # Charger les templates et les pré-traiter
-    templates = []
+    # === 1. Charger les templates avec noms dans un dictionnaire ===
+    templates = {}
     for file in os.listdir(templates_dir):
         if file.endswith((".jpg", ".png")):
             template_path = os.path.join(templates_dir, file)
-            template = cv2.imread(template_path)
-            if template is not None:
-                template = preprocess_image(template, target_size)
-                templates.append(template)
+            template_image = cv2.imread(template_path)
+            if template_image is not None:
+                processed = preprocess_image(template_image, target_size)
+                templates[file] = processed
 
-    # Parcourir les extraits pour comparaison
+    # === 2. Parcourir les extraits à comparer ===
     for fichier_extrait in os.listdir(extraits_dir):
         if fichier_extrait.endswith((".jpg", ".png")):
-            # Charger et pré-traiter l'extrait
             extrait_path = os.path.join(extraits_dir, fichier_extrait)
-            extrait = cv2.imread(extrait_path)
-            if extrait is None:
+            extrait_image = cv2.imread(extrait_path)
+            if extrait_image is None:
                 continue
-            extrait = preprocess_image(extrait, target_size)
 
-            # Détecter les points clés et descripteurs de l'extrait
-            kp_extrait, des_extrait = orb.detectAndCompute(extrait, None)
+            extrait_processed = preprocess_image(extrait_image, target_size)
+            kp_extrait, des_extrait = orb.detectAndCompute(extrait_processed, None)
 
-            # Initialiser les variables pour le meilleur match
+            if des_extrait is None:
+                print(f"[AVERTISSEMENT] Pas de descripteurs pour {fichier_extrait}")
+                continue
+
+            # Variables pour retenir le meilleur match
             best_match_count = 0
+            best_template_name = None
             best_template = None
             best_matches = None
+            best_kp_template = None
 
-            # Parcourir les templates
-            for template in templates:
-                # Détecter les points clés et descripteurs du template
-                kp_template, des_template = orb.detectAndCompute(template, None)
-
-                # Passer si aucun descripteur n'est trouvé
+            # === 3. Comparer avec chaque template ===
+            for name, template_processed in templates.items():
+                kp_template, des_template = orb.detectAndCompute(template_processed, None)
                 if des_template is None:
                     continue
 
-                # Trouver les correspondances
                 matches = bf.match(des_extrait, des_template)
-
-                # Trier les correspondances par distance
                 matches = sorted(matches, key=lambda x: x.distance)
 
-                # Mettre à jour le meilleur match
                 if len(matches) > best_match_count:
                     best_match_count = len(matches)
-                    best_template = template
+                    best_template_name = name
+                    best_template = template_processed
                     best_matches = matches
                     best_kp_template = kp_template
 
-            # Seuil de nombre de bonnes correspondances
-            SEUIL_BONNES_CORRESPONDANCES = 10  # Ajuster ce seuil ici
+            # === 4. Vérifier si le match est suffisant ===
+            SEUIL_BONNES_CORRESPONDANCES = 10
+            if best_template is not None and best_match_count >= SEUIL_BONNES_CORRESPONDANCES:
+                print(f"[MATCH] {fichier_extrait} correspond à {best_template_name} avec {best_match_count} correspondances.")
 
-            # Afficher les résultats
-            if best_template is not None and best_match_count > SEUIL_BONNES_CORRESPONDANCES:
                 # Dessiner les correspondances
-                result = cv2.drawMatches(extrait, kp_extrait, best_template, best_kp_template, best_matches[:20], None, flags=2)
+                result = cv2.drawMatches(
+                    extrait_processed, kp_extrait,
+                    best_template, best_kp_template,
+                    best_matches[:20], None, flags=2
+                )
 
-                # Afficher le résultat
-                cv2.imshow("Meilleur Matching", result)
+                # Ajouter le nom du panneau reconnu en haut de l'image
+                cv2.putText(result, f"Match: {best_template_name}", (10, 30),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
+
+                # Afficher l'image avec le nom du match
+                cv2.imshow(f"Matching - {fichier_extrait}", result)
                 cv2.waitKey(0)
-            else:
-                print(f"Aucun match fiable pour {fichier_extrait}")
+
 
     cv2.destroyAllWindows()
 
-# Chemin des dossiers contenant les extraits et les templates
+# === 5. Chemins des dossiers ===
 extraits_dir = 'panneaux_extraits'
 templates_dir = 'templates'
 
-# Appeler la fonction
+# === 6. Lancer le matching ===
 template_matching_orb(extraits_dir, templates_dir)
