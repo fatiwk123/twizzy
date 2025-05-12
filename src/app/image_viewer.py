@@ -73,16 +73,19 @@ class ImageViewer:
     def image_treatment_contours(self):
         """Process contours current image"""
 
-        # cv2 image
-        image_contours = detection.detect_and_extract_shapes(self.image_opened_path)
-        height, width = image_contours.shape[:2]
-        new_window = tk.Toplevel(self.root)
-        new_window.title("Contours")
-        canvas = tk.Canvas(new_window, width=width, height=height, bg="white")
-        canvas.pack()
+        if self.image_tk == None:
+            print("Erreur : Aucune image chargée")
+        else:
+            # cv2 image
+            image_contours = detection.detect_and_extract_shapes(self.image_opened_path)
+            height, width = image_contours.shape[:2]
+            new_window = tk.Toplevel(self.root)
+            new_window.title("Contours")
+            canvas = tk.Canvas(new_window, width=width, height=height, bg="white")
+            canvas.pack()
 
-        image_contours_rgb = cv2.cvtColor(image_contours, cv2.COLOR_BGR2RGB)
-        image_contours_pil = Image.fromarray(image_contours_rgb)
-        image_contours_tkinter = ImageTk.PhotoImage(image=image_contours_pil)
-        canvas.create_image(0, 0, anchor="nw", image=image_contours_tkinter)
-        canvas.image = image_contours_tkinter
+            image_contours_rgb = cv2.cvtColor(image_contours, cv2.COLOR_BGR2RGB)
+            image_contours_pil = Image.fromarray(image_contours_rgb)
+            image_contours_tkinter = ImageTk.PhotoImage(image=image_contours_pil)
+            canvas.create_image(0, 0, anchor="nw", image=image_contours_tkinter)
+            canvas.image = image_contours_tkinter
