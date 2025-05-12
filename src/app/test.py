@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # === 1. Charger l'image de test ===
-test_image = cv2.imread("images/image_test__final/GOPR0156.jpg")
+test_image = cv2.imread("twizzy/images/image_test__final/GOPR0156.jpg")
 test_image = cv2.resize(test_image, (640, 480))
 gray = cv2.cvtColor(test_image, cv2.COLOR_BGR2GRAY)
 
