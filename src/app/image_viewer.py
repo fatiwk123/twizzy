@@ -1,7 +1,14 @@
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
+import sys
+import os
+import cv2
 
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
+import detection
 
 # todo : create docstring for this class
 
@@ -25,8 +32,8 @@ class ImageViewer:
         # Bouton pour lancer traitement
         self.btn_treatment = tk.Button(
             button_frame,
-            text="Launch treatment",
-            command=self.image_treatment_placeholder,
+            text="Launch Contour Detection",
+            command=self.image_treatment_contours,
         )
         self.btn_treatment.pack(side=tk.LEFT, padx=5)
 
@@ -63,6 +70,22 @@ class ImageViewer:
         # Affichage
         self.canvas.create_image(0, 0, anchor="nw", image=self.image_tk)
 
-    def image_treatment_placeholder(self):
-        """Process current image"""
-        return 0
+    def image_treatment_contours(self):
+        """Process contours current image"""
+
+        if self.image_tk == None:
+            print("Erreur : Aucune image chargée")
+        else:
+            # cv2 image
+            image_contours = detection.detect_and_extract_shapes(self.image_opened_path)
+            height, width = image_contours.shape[:2]
+            new_window = tk.Toplevel(self.root)
+            new_window.title("Contours")
+            canvas = tk.Canvas(new_window, width=width, height=height, bg="white")
+            canvas.pack()
+
+            image_contours_rgb = cv2.cvtColor(image_contours, cv2.COLOR_BGR2RGB)
+            image_contours_pil = Image.fromarray(image_contours_rgb)
+            image_contours_tkinter = ImageTk.PhotoImage(image=image_contours_pil)
+            canvas.create_image(0, 0, anchor="nw", image=image_contours_tkinter)
+            canvas.image = image_contours_tkinter
