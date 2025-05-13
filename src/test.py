@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 # === PARAMÈTRES ===
-IMAGE_PATH = 'images/image_test__final/G0020129.JPG'
+IMAGE_PATH = 'images/image_test__final/GOPR0153.jpg'
 TEMPLATES_DIR = 'templates'
 OUTPUT_DIR = 'panneaux_extraits'
 TARGET_SIZE = (100, 100)

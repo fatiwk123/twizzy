@@ -5,6 +5,7 @@ from image_viewer import ImageViewer
 from video_viewer import VideoViewer
 
 
+
 class MainWindow:
     def __init__(self, root):
         self.root = root
