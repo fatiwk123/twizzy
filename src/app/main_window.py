@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from image_viewer import ImageViewer
 from video_viewer import VideoViewer
 
+
 class MainWindow:
     def __init__(self, root):
         self.root = root
@@ -27,10 +28,10 @@ class MainWindow:
         )
         self.btn_video.pack(side=tk.LEFT, padx=5)
         button_frame.pack_configure(anchor=tk.CENTER)
-        
+
         self.image_viewer_opened = None
         self.video_viewer_opened = None
-        
+
     def create_image_viewer(self):
         """creates and displays image viewer"""
         new_window = tk.Toplevel(root)
@@ -45,8 +46,8 @@ class MainWindow:
         self.video_viewer_opened = video_viewer
         return video_viewer
 
+
 # Run the app; Put in a main file later
 root = tk.Tk()
 app = MainWindow(root)
 root.mainloop()
-        
