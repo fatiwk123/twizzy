@@ -9,10 +9,10 @@ def preprocess_image(image, target_size=(100, 100)):
     resized = cv2.resize(gray, target_size)
     return resized
 
-def template_matching_orb(extraits_dir, templates_dir, target_size=(100, 100)):
+def template_matching_orb(extraits_dir = 'panneaux_extraits', templates_dir = 'templates', target_size=(100, 100)):
     orb = cv2.ORB_create()
     bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-
+    matched_list = []
     # === 1. Charger les templates avec noms dans un dictionnaire ===
     templates = {}
     for file in os.listdir(templates_dir):
@@ -78,15 +78,6 @@ def template_matching_orb(extraits_dir, templates_dir, target_size=(100, 100)):
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
 
                 # Afficher l'image avec le nom du match
-                cv2.imshow(f"Matching - {fichier_extrait}", result)
-                cv2.waitKey(0)
+                matched_list.append(result)
 
-
-    cv2.destroyAllWindows()
-
-# === 5. Chemins des dossiers ===
-extraits_dir = 'panneaux_extraits'
-templates_dir = 'templates'
-
-# === 6. Lancer le matching ===
-template_matching_orb(extraits_dir, templates_dir)
+    return matched_list
