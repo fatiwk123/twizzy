@@ -61,47 +61,50 @@ def match_roi(roi, templates, orb, bf, target_size=(100, 100), seuil_distance=20
 
     return best_name, best_match_count
 
-# ========== MAIN ==========
-video_path = 'video/video1.avi'  # Mets ici le chemin vers ta vidéo
-templates_dir = 'templates'
-SEUIL_CORRESPONDANCES = 5  # Seuil pour valider un match
 
-orb = cv2.ORB_create()
-bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
-templates = load_templates(templates_dir)
+def match_video(video_path, templates_dir = 'templates'):
+    SEUIL_CORRESPONDANCES = 5  # Seuil pour valider un match
 
-cap = cv2.VideoCapture(video_path)
-if not cap.isOpened():
-    print("[ERREUR] Impossible d'ouvrir la vidéo.")
-    exit()
+    orb = cv2.ORB_create()
+    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+    templates = load_templates(templates_dir)
 
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print("[ERREUR] Impossible d'ouvrir la vidéo.")
+        exit()
 
-    original = frame.copy()
-    contours = detect_red_regions(frame)
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-    for cnt in contours:
-        x, y, w, h = cv2.boundingRect(cnt)
-        roi = original[y:y+h, x:x+w]
+        original = frame.copy()
+        contours = detect_red_regions(frame)
 
-        if roi.size == 0 or w < 20 or h < 20:
-            continue  # Ignore les petits bruits
+        for cnt in contours:
+            x, y, w, h = cv2.boundingRect(cnt)
+            roi = original[y:y+h, x:x+w]
 
-        best_name, match_count = match_roi(roi, templates, orb, bf)
+            if roi.size == 0 or w < 20 or h < 20:
+                continue  # Ignore les petits bruits
 
-        if best_name and match_count >= SEUIL_CORRESPONDANCES:
-            label = f"{best_name} ({match_count})"
-            cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-            cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                        0.5, (0, 255, 0), 1)
+            best_name, match_count = match_roi(roi, templates, orb, bf)
 
-    cv2.imshow("Vidéo - Détection et Reconnaissance", frame)
-    key = cv2.waitKey(100)  # 30ms entre chaque frame (~30 FPS)
-    if key == 27:
-        break
+            if best_name and match_count >= SEUIL_CORRESPONDANCES:
+                label = f"{best_name} ({match_count})"
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+                cv2.putText(frame, label, (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.5, (0, 255, 0), 1)
 
-cap.release()
-cv2.destroyAllWindows()
+        cv2.imshow("Vidéo - Détection et Reconnaissance", frame)
+        key = cv2.waitKey(100)  # 30ms entre chaque frame (~30 FPS)
+        if key == 27:
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
+# video_path = 'video/video1.avi'  # Mets ici le chemin vers ta vidéo
+# templates_dir = 'templates'
+# match_video(video_path)

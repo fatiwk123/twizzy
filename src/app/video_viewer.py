@@ -2,7 +2,13 @@ import tkinter as tk
 from tkinter import filedialog
 import cv2
 from PIL import Image, ImageTk
+import os
+import sys
 
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
+import matching_video
 
 class VideoViewer:
     def __init__(self, root):
@@ -37,10 +43,10 @@ class VideoViewer:
         )
         self.btn_play.pack(side=tk.LEFT, padx=5)
 
-        self.btn_process = tk.Button(
-            button_frame, text="Process Video", command=self.process_video
+        self.btn_matching = tk.Button(
+            button_frame, text="Match", command=self.process_video
         )
-        self.btn_process.pack(side=tk.LEFT, padx=5)
+        self.btn_matching.pack(side=tk.LEFT, padx=5)
 
     def open_video(self):
         """Load a video file using OpenCV."""
@@ -87,5 +93,12 @@ class VideoViewer:
                 self.is_playing = False
 
     def process_video(self):
-        """Placeholder for video processing (e.g., filters, object detection)."""
-        return 0
+        """Opens a cv2 video with active matching"""
+        
+        if self.video_path == None:
+            print('Erreur : Aucune video chargée')
+        elif self.is_playing != False:
+            print('Erreur : Mettez la video en pause avant de lancer le matching')
+        else:
+            matching_video.match_video(self.video_path)
+        
