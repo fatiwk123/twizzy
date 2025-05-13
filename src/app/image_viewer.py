@@ -11,6 +11,7 @@ sys.path.append(parent_dir)
 import detection
 import hsv_tuner
 import matching
+
 # todo : create docstring for this class
 
 
@@ -133,7 +134,7 @@ class ImageViewer:
         else:
             matched_list = matching.template_matching_orb()
             for matched in matched_list:
-                
+
                 height, width = matched.shape[:2]
                 new_window = tk.Toplevel(self.root)
                 new_window.title("Match")
