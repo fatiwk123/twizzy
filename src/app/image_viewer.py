@@ -9,7 +9,8 @@ parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
 import detection
-
+import hsv_tuner
+import matching
 # todo : create docstring for this class
 
 
@@ -29,13 +30,29 @@ class ImageViewer:
         )
         self.btn_select.pack(side=tk.LEFT, padx=5)
 
-        # Bouton pour lancer traitement
-        self.btn_treatment = tk.Button(
+        # Bouton pour lancer traitement contours
+        self.btn_treatment_contours = tk.Button(
             button_frame,
             text="Launch Contour Detection",
             command=self.image_treatment_contours,
         )
-        self.btn_treatment.pack(side=tk.LEFT, padx=5)
+        self.btn_treatment_contours.pack(side=tk.LEFT, padx=5)
+
+        # Bouton pour lancer traitement hsv
+        self.btn_treatment_hsv = tk.Button(
+            button_frame,
+            text="Launch HSV Treatment",
+            command=self.image_treatment_hsv,
+        )
+        self.btn_treatment_hsv.pack(side=tk.LEFT, padx=5)
+
+        # Bouton pour lancer tmatching
+        self.btn_treatment_matching = tk.Button(
+            button_frame,
+            text="Launch Matching",
+            command=self.image_treatment_matching,
+        )
+        self.btn_treatment_matching.pack(side=tk.LEFT, padx=5)
 
         button_frame.pack_configure(anchor=tk.CENTER)
 
@@ -89,3 +106,42 @@ class ImageViewer:
             image_contours_tkinter = ImageTk.PhotoImage(image=image_contours_pil)
             canvas.create_image(0, 0, anchor="nw", image=image_contours_tkinter)
             canvas.image = image_contours_tkinter
+
+    def image_treatment_hsv(self):
+        """Process hsv current image"""
+
+        if self.image_tk == None:
+            print("Erreur : Aucune image chargée")
+        else:
+            # cv2 image
+            image_hsv = hsv_tuner.hsv_tuner(self.image_opened_path)
+            height, width = image_hsv.shape[:2]
+            new_window = tk.Toplevel(self.root)
+            new_window.title("HSV")
+            canvas = tk.Canvas(new_window, width=width, height=height, bg="white")
+            canvas.pack()
+
+            image_hsv_rgb = cv2.cvtColor(image_hsv, cv2.COLOR_BGR2RGB)
+            image_hsv_pil = Image.fromarray(image_hsv_rgb)
+            image_hsv_tkinter = ImageTk.PhotoImage(image=image_hsv_pil)
+            canvas.create_image(0, 0, anchor="nw", image=image_hsv_tkinter)
+            canvas.image = image_hsv_tkinter
+
+    def image_treatment_matching(self):
+        if self.image_tk == None:
+            print("Erreur : Aucune image chargée")
+        else:
+            matched_list = matching.template_matching_orb()
+            for matched in matched_list:
+                
+                height, width = matched.shape[:2]
+                new_window = tk.Toplevel(self.root)
+                new_window.title("Match")
+                canvas = tk.Canvas(new_window, width=width, height=height, bg="white")
+                canvas.pack()
+
+                image_match_rgb = cv2.cvtColor(matched, cv2.COLOR_BGR2RGB)
+                image_match_pil = Image.fromarray(image_match_rgb)
+                image_match_tkinter = ImageTk.PhotoImage(image=image_match_pil)
+                canvas.create_image(0, 0, anchor="nw", image=image_match_tkinter)
+                canvas.image = image_match_tkinter
